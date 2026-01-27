@@ -37,6 +37,7 @@ final class VisitorLogDb
             KEY idx_user_agent (user_agent)
         ) $charset_collate;";
 
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql_logs);
     }
 
