@@ -2,7 +2,8 @@
 
 namespace NeonWebId\SimpleVisitorLogs\VisitorLogAdminMenu\Pages;
 
-use JetBrains\PhpStorm\NoReturn;use NeonWebId\SimpleVisitorLogs\VisitorLogDb;
+use JetBrains\PhpStorm\NoReturn;
+use NeonWebId\SimpleVisitorLogs\VisitorLogDb;
 
 final class VisitorLogs
 {
@@ -114,7 +115,7 @@ final class VisitorLogs
         $offset   = ($page - 1) * $per_page;
 
         $search    = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
-        $f_ip      = isset($_GET['f_ip']) ? sanitize_text_field($_GET['f_ip']) : '';
+        $f_ip      = isset($_GET['ip_address']) ? sanitize_text_field($_GET['ip_address']) : '';
         $f_country = isset($_GET['f_country']) ? sanitize_text_field($_GET['f_country']) : '';
         $f_asn     = isset($_GET['f_asn']) ? sanitize_text_field($_GET['f_asn']) : '';
 
@@ -183,7 +184,7 @@ final class VisitorLogs
 
                     <div class="svl-filter-item">
                         <label>Filter IP</label>
-                        <select name="f_ip" class="svl-select2-ajax" data-action="svl_get_ips">
+                        <select name="ip_address" class="svl-select2-ajax" data-action="svl_get_ips">
                             <?php if($f_ip) {echo '<option value="'.esc_attr($f_ip).'" selected>'.esc_html($f_ip).'</option>';} ?>
                         </select>
                     </div>
@@ -355,6 +356,48 @@ final class VisitorLogs
                 .svl-filter-actions { justify-content: flex-end; }
                 .svl-header-flex { flex-direction: column; align-items: flex-start; }
             }
+
+            .tablenav-pages {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-size: 12px;
+            }
+
+            .tablenav-pages .displaying-num {
+                margin-right: 6px;
+                color: #666;
+            }
+
+            .tablenav-pages .page-numbers {
+                min-width: 26px;
+                padding: 3px 6px;
+                text-align: center;
+                text-decoration: none;
+                border: 1px solid #dcdcde;
+                border-radius: 3px;
+                background: #fff;
+                color: #2271b1;
+                line-height: 1.3;
+            }
+
+            .tablenav-pages .page-numbers:hover {
+                background: #f6f7f7;
+            }
+
+            .tablenav-pages .page-numbers.current {
+                background: #2271b1;
+                border-color: #2271b1;
+                color: #fff;
+            }
+
+            .tablenav-pages .page-numbers.dots {
+                border: none;
+                background: transparent;
+                padding: 0 2px;
+                color: #666;
+            }
+
         </style>
         <?php
     }
