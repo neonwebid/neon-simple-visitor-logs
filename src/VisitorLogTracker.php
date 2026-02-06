@@ -154,6 +154,7 @@ final class VisitorLogTracker
             'siteauditor',
             'screamingfrog',
             'barkrowler',
+            'comscore.com',
 
             // Social / feed preview (noise tinggi, tidak bernilai forensik)
             'facebookexternalhit',
@@ -189,6 +190,11 @@ final class VisitorLogTracker
 
             // Commercial crawler yang known & konsisten
             'geedoshopproductfinder',
+            'uptimerobot',
+			'ping.blo.gs',
+			'feedfetcher-google',
+			'archive.org_bot',
+			'sirdata.net'
         ];
 
         foreach ($bots as $bot) {
