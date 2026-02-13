@@ -107,3 +107,7 @@ https://www.gnu.org/licenses/gpl-2.0.html
 
 **Wakhid Wicaksono**  
 [https://wichaksono.github.io/](https://wichaksono.github.io/)
+
+**Post**
+
+[Website Diserang Traffic Bot, Spam, & Scanner? Ini Cara Efektif Mengamankannya dengan Cloudflare WAF](https://neon.web.id/atasi-traffic-bot-scanner-dengan-cloudflare-waf/)
