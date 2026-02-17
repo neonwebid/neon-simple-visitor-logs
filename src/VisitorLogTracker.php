@@ -195,6 +195,7 @@ final class VisitorLogTracker
 			'feedfetcher-google',
 			'archive.org_bot',
 			'sirdata.net'
+			'amzn-searchbot'
         ];
 
         foreach ($bots as $bot) {
