@@ -11,19 +11,26 @@
   - IP long (untuk sorting & analisis)
   - Negara
   - ASN & ASN Number
+  - ISP & Organisasi (Provider)
+  - Pendeteksi Tipe (Hosting, ISP, Selular, Proxy, Mobile)
   - Path yang diakses
   - Referrer
   - User-Agent
-  - Timestamp
+  - Timestamp (bisa diatur Local WP Time atau UTC)
 
 - **Exclude berbasis User-Agent**
-  - Exact match (aman & cepat)
-  - Cocok untuk bot, crawler, dan UA spesifik
+  - Built-in list bots populer (Googlebot, Bingbot, dll)
+  - Custom list tambahan yang bisa ditambah/dihapus via menu Settings
   - Tidak berbasis IP / ASN (menghindari false positive)
 
 - **ASN Manager**
-  - Dasar pengelompokan ASN (Block / Challenge / Monitor)
-  - Siap disinkronkan dengan Cloudflare (opsional)
+  - Analisis trafik berdasarkan Organisasi (ISP/Hosting) dan AS Number
+  - Dilengkapi pendeteksi tipe (Hosting / ISP / Selular)
+  - Tampilan tabel yang sepenuhnya responsif di perangkat mobile
+
+- **Submenu Settings**
+  - **Exclude User-Agent**: Satu textarea untuk mengelola daftar User-Agent tambahan yang ingin diabaikan
+  - **Datetime Mode**: Pengaturan zona waktu untuk `created_at` agar mengikuti waktu lokal WordPress atau UTC
 
 - Desain database **index-aware**
   - Aman untuk data besar
@@ -62,6 +69,11 @@ Kolom utama:
 - `country`
 - `asn`
 - `asn_number`
+- `isp`
+- `org`
+- `hosting`
+- `proxy`
+- `mobile`
 - `path`
 - `referrer`
 - `user_agent`
@@ -75,36 +87,11 @@ Index penting:
 
 ---
 
-### `visitor_log_excludes`
-
-Menyimpan User-Agent yang **tidak perlu dicatat**.
-
-Kolom:
-- `user_agent` (VARCHAR 255, exact match)
-- `active`
-
-Index:
-- `(active, user_agent)` (composite / unique disarankan)
-
-
 ## Cara Kerja Exclude
 
-- Exclude dilakukan **hanya berdasarkan User-Agent**
-- Rule exclude berisi **signature User-Agent pendek**
-- Pencocokan menggunakan **substring match (CONTAINS)**
-- Proses matching dilakukan langsung di database dengan `LIMIT 1`
-- Tidak ada loop PHP dan tidak memuat seluruh data ke memory
-- Aman untuk volume data besar
-
-Contoh User-Agent signature yang cocok untuk exclude:
-```
-Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
-Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)
-Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)
-facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)
-Mozilla/5.0 (compatible; Applebot/0.1; +http://www.apple.com/go/applebot)
-
-```
+- Exclude dilakukan berdasarkan built-in bots dan list tambahan yang diatur di WordPress Options (`svl_exclude_user_agents`) via submenu Settings.
+- Pencocokan menggunakan **substring match (CONTAINS)**.
+- Jika User-Agent mengandung salah satu signature, kunjungan tidak akan dicatat.
 
 ---
 
@@ -112,12 +99,10 @@ Mozilla/5.0 (compatible; Applebot/0.1; +http://www.apple.com/go/applebot)
 
 1. Upload folder plugin ke:
 ```
-
 wp-content/plugins/neon-simple-visitor-logs
-
 ```
 2. Aktifkan melalui **WordPress Admin → Plugins**
-3. Tabel database otomatis dibuat saat aktivasi
+3. Tabel database otomatis dibuat saat aktivasi (dan diperbarui otomatis saat update ke versi baru)
 
 ---
 
@@ -130,7 +115,7 @@ wp-content/plugins/neon-simple-visitor-logs
 
 ## Kebutuhan Sistem
 
-- WordPress 6.8+
+- WordPress 6.4+
 - PHP 8.2+
 - MySQL / MariaDB (InnoDB)
 
@@ -141,10 +126,10 @@ wp-content/plugins/neon-simple-visitor-logs
 - Plugin ini **bukan analytics visual**
 - Plugin ini **bukan pengganti Google Analytics**
 - Plugin ini dibuat untuk:
-- monitoring teknis
-- forensic ringan
-- analisis traffic non-visual
-- security awareness
+  - monitoring teknis
+  - forensic ringan
+  - analisis traffic non-visual
+  - security awareness
 
 ---
 
