@@ -139,30 +139,31 @@ final class VisitorLogTracker
 
         $ua = strtolower($ua);
 
-        // KHUSUS:
-        $specials = [
-            'mediapartners-google',
-            'chrome privacy preserving prefetch proxy'
-        ];
-
-        if (in_array($ua, $specials, true)) {
-            return true; // EXCLUDE
-        }
-
         $bots = [
-            // Search engines (stabil, predictable)
+            // Search engines & bots
             'googlebot',
             'google-inspectiontool',
+            'google-read-aloud',
+            'google-adstxt',
+            'google-extended',
+            'googleimageproxy',
+            'googleadsenseinfeed',
+            'mediapartners-google',
             'bingbot',
             'yandexbot',
             'applebot',
             'baiduspider',
             'duckduckbot',
+            'duckassistbot',
             'exabot',
             'seznambot',
             'sogou',
+            'qwantbot',
+            'bravebot',
+            'amzn-searchbot',
+            'amazonbot',
 
-            // SEO tools (legit, high volume, low security value)
+            // SEO & analysis tools
             'semrushbot',
             'ahrefsbot',
             'serankingbacklinksbot',
@@ -174,20 +175,22 @@ final class VisitorLogTracker
             'screamingfrog',
             'barkrowler',
 
-            // Social / feed preview (noise tinggi, tidak bernilai forensik)
+            // Social, messaging & feed preview
             'facebookexternalhit',
             'facebot',
             'twitterbot',
             'linkedinbot',
             'pinterest',
+            'pinterestbot',
             'slackbot',
             'telegrambot',
             'whatsapp',
             'discordbot',
             'feedburner',
 
-            // AI crawlers (identitas jelas, bukan exploit tools)
+            // AI crawlers & LLM bots
             'gptbot',
+            'oai-searchbot',
             'openai',
             'anthropic',
             'claudebot',
@@ -196,18 +199,24 @@ final class VisitorLogTracker
             'cohere',
             'meta-webindexer',
 
-            // Ads / brand verification (otomatis & repetitif)
+            // Ads, trackers, monitoring & brand verification
             'awariobot',
             'dataforseobot',
             'ias-or',
             'integralads',
+            'integralads.com',
             'admantx',
             'doubleverify',
             'moatbot',
             'pixalate',
-
-            // Commercial crawler yang known & konsisten
+            'uptimerobot',
+            'audigentadbot',
+            'abevalbot',
+            'bidswitchbot',
             'geedoshopproductfinder',
+
+            // Prefetch & other proxy services
+            'chrome privacy preserving prefetch proxy'
         ];
 
         $bots = apply_filters('neon_simple_visitor_logs_bots', $bots);
