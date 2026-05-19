@@ -3,20 +3,20 @@
 namespace NeonWebId\SimpleVisitorLogs\VisitorLogAdminMenu;
 
 use NeonWebId\SimpleVisitorLogs\VisitorLogAdminMenu\Pages\ASNManager;
-use NeonWebId\SimpleVisitorLogs\VisitorLogAdminMenu\Pages\IPManager;
+use NeonWebId\SimpleVisitorLogs\VisitorLogAdminMenu\Pages\Settings;
 use NeonWebId\SimpleVisitorLogs\VisitorLogAdminMenu\Pages\VisitorLogs;
 
 final class VisitorLogAdminMenu
 {
     private VisitorLogs $visitorLogs;
     private ASNManager $asnManager;
-    private IPManager $IPManager;
+    private Settings $settings;
 
     public function __construct()
     {
-        $this->visitorLogs       = new VisitorLogs();
-        $this->asnManager        = new ASNManager();
-        $this->IPManager = new IPManager();
+        $this->visitorLogs = new VisitorLogs();
+        $this->asnManager  = new ASNManager();
+        $this->settings    = new Settings();
         add_action('admin_menu', [$this, 'register']);
     }
 
@@ -58,14 +58,14 @@ final class VisitorLogAdminMenu
             [$this->asnManager, 'render']
         );
 
-        // Submenu: IP Manager
+        // Submenu: Settings
         add_submenu_page(
             'svl-visitor-logs',
-            'IP Manager',
-            'IP Manager',
+            'Settings',
+            'Settings',
             'manage_options',
-            'svl-ip-manager',
-            [$this->IPManager, 'render']
+            'svl-settings',
+            [$this->settings, 'render']
         );
 
     }

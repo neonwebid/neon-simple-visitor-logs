@@ -2,10 +2,10 @@
 /**
  * Plugin Name: Neon Simple Visitor Logs
  * Plugin URI: https://neon.web.id/
- * Description: Lightweight visitor logger untuk mencatat IP, ASN, negara, path, referrer, dan User-Agent.
- * Version: 1.0.0
- * Author: Wakhid Wicaksono
- * Author URI: https://wichaksono.github.io/
+ * Description: Lightweight visitor logger untuk mencatat IP, ASN, negara, path, referrer, dan User-Agent dengan kontrol exclude berbasis User-Agent dan manajemen ASN.
+ * Version: 2.0.0
+ * Author: NeonWebId
+ * Author URI: https://neon.web.id/
  * Requires at least: 6.4
  * Requires PHP: 8.2
  * License: GPL v2 or later
@@ -28,4 +28,11 @@ register_activation_hook(__FILE__, [VisitorLogDb::class, 'create']);
 
 add_action('plugins_loaded', [VisitorLogAdminMenu::class, 'init']);
 add_action('plugins_loaded', [VisitorLogTracker::class, 'init']);
+add_action('plugins_loaded', function () {
+    $db_version = (int) get_option('svl_db_version', 0);
+    if ($db_version < 2) {
+        VisitorLogDb::create();
+        update_option('svl_db_version', 2);
+    }
+});
 

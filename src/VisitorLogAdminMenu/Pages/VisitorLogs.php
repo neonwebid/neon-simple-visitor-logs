@@ -2,8 +2,7 @@
 
 namespace NeonWebId\SimpleVisitorLogs\VisitorLogAdminMenu\Pages;
 
-use JetBrains\PhpStorm\NoReturn;
-use NeonWebId\SimpleVisitorLogs\VisitorLogDb;
+use JetBrains\PhpStorm\NoReturn;use NeonWebId\SimpleVisitorLogs\VisitorLogDb;
 
 final class VisitorLogs
 {
@@ -115,7 +114,7 @@ final class VisitorLogs
         $offset   = ($page - 1) * $per_page;
 
         $search    = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
-        $f_ip      = isset($_GET['ip_address']) ? sanitize_text_field($_GET['ip_address']) : '';
+        $f_ip      = isset($_GET['f_ip']) ? sanitize_text_field($_GET['f_ip']) : '';
         $f_country = isset($_GET['f_country']) ? sanitize_text_field($_GET['f_country']) : '';
         $f_asn     = isset($_GET['f_asn']) ? sanitize_text_field($_GET['f_asn']) : '';
 
@@ -184,7 +183,7 @@ final class VisitorLogs
 
                     <div class="svl-filter-item">
                         <label>Filter IP</label>
-                        <select name="ip_address" class="svl-select2-ajax" data-action="svl_get_ips">
+                        <select name="f_ip" class="svl-select2-ajax" data-action="svl_get_ips">
                             <?php if($f_ip) {echo '<option value="'.esc_attr($f_ip).'" selected>'.esc_html($f_ip).'</option>';} ?>
                         </select>
                     </div>
@@ -230,6 +229,7 @@ final class VisitorLogs
                             <span>Country</span><span class="sorting-indicator"></span>
                         </a>
                     </th>
+                    <th style="width: 100px;">Type</th>
                     <th id="asn" class="manage-column sortable <?php echo ($orderby === 'asn') ? strtolower($order) : 'desc'; ?>" style="width: 180px;">
                         <a href="<?php echo $this->get_sort_url('asn', $orderby, $order); ?>">
                             <span>Organization (ASN)</span><span class="sorting-indicator"></span>
@@ -256,6 +256,19 @@ final class VisitorLogs
                                 <?php echo esc_html($log->country); ?>
                             </span>
                         </td>
+                        <td>
+                            <?php 
+                            $type = 'ISP';
+                            if (!empty($log->hosting)) {
+                                $type = 'Hosting';
+                            } elseif (!empty($log->mobile)) {
+                                $type = 'Selular';
+                            }
+                            ?>
+                            <span class="svl-type-badge svl-type-<?php echo esc_attr(strtolower($type)); ?>">
+                                <?php echo esc_html($type); ?>
+                            </span>
+                        </td>
                         <td class="svl-col-asn">
                             <span class="svl-asn-text"><?php echo esc_html($log->asn); ?></span>
                         </td>
@@ -272,7 +285,7 @@ final class VisitorLogs
                         </td>
                     </tr>
                 <?php endforeach; else: ?>
-                    <tr><td colspan="6" style="text-align:center">No visitor logs found.</td></tr>
+                    <tr><td colspan="7" style="text-align:center">No visitor logs found.</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>
@@ -341,6 +354,30 @@ final class VisitorLogs
 
             .svl-ip-code { background: #f0f6fb; color: #0073aa; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px; border: 1px solid #d9eaf7; }
             .svl-badge-country { background: #e7e7ed; color: #3c434a; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+            .svl-type-badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+                text-align: center;
+            }
+            .svl-type-hosting {
+                background: #f3e8ff;
+                color: #6b21a8;
+                border: 1px solid #e9d5ff;
+            }
+            .svl-type-isp {
+                background: #dbeafe;
+                color: #1e40af;
+                border: 1px solid #bfdbfe;
+            }
+            .svl-type-selular {
+                background: #fef3c7;
+                color: #92400e;
+                border: 1px solid #fde68a;
+            }
             .svl-asn-text { color: #50575e; font-size: 12px; }
 
             .svl-path code { background: #f6f7f7; color: #d63638; padding: 2px 4px; border-radius: 3px; font-size: 12px; }

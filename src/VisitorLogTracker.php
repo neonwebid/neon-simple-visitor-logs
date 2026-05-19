@@ -55,7 +55,7 @@ final class VisitorLogTracker
         // ===== CACHE ASN / COUNTRY =====
         $cached = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT country, asn, asn_number
+                "SELECT country, asn, asn_number, isp, org, hosting, proxy, mobile
                  FROM $table
                  WHERE ip_address = %s AND asn_number > 0
                  ORDER BY id DESC LIMIT 1",
@@ -66,11 +66,16 @@ final class VisitorLogTracker
         $country = $cached->country ?? 'Unknown';
         $asn     = $cached->asn ?? 'Unknown';
         $asn_num = $cached->asn_number ?? 0;
+        $isp     = $cached->isp ?? 'Unknown';
+        $org     = $cached->org ?? 'Unknown';
+        $hosting = isset($cached->hosting) ? (int)$cached->hosting : 0;
+        $proxy   = isset($cached->proxy) ? (int)$cached->proxy : 0;
+        $mobile  = isset($cached->mobile) ? (int)$cached->mobile : 0;
 
         // ===== LOOKUP ONLY IF NEEDED =====
         if (!$cached) {
             $res = wp_remote_get(
-                "http://ip-api.com/json/{$ip}?fields=status,country,as",
+                "http://ip-api.com/json/{$ip}?fields=status,country,isp,org,as,hosting,proxy,mobile",
                 ['timeout' => 3]
             );
 
@@ -82,9 +87,18 @@ final class VisitorLogTracker
                     if (preg_match('/^AS(\d+)/i', $asn, $m)) {
                         $asn_num = (int) $m[1];
                     }
+                    $isp     = $body['isp'] ?? 'Unknown';
+                    $org     = $body['org'] ?? 'Unknown';
+                    $hosting = isset($body['hosting']) ? ($body['hosting'] ? 1 : 0) : 0;
+                    $proxy   = isset($body['proxy']) ? ($body['proxy'] ? 1 : 0) : 0;
+                    $mobile  = isset($body['mobile']) ? ($body['mobile'] ? 1 : 0) : 0;
                 }
             }
         }
+
+        // ===== DATETIME SETTING =====
+        $datetime_mode = get_option('svl_datetime_mode', 'local');
+        $created_at    = ($datetime_mode === 'utc') ? current_time('mysql', 1) : current_time('mysql');
 
         // ===== INSERT LOG =====
         $wpdb->insert($table, [
@@ -93,10 +107,15 @@ final class VisitorLogTracker
             'country'    => $country,
             'asn'        => $asn,
             'asn_number' => $asn_num,
+            'isp'        => $isp,
+            'org'        => $org,
+            'hosting'    => $hosting,
+            'proxy'      => $proxy,
+            'mobile'     => $mobile,
             'path'       => $path,
             'referrer'   => $_SERVER['HTTP_REFERER'] ?? '',
             'user_agent' => $ua ?: 'None',
-            'created_at' => current_time('mysql'),
+            'created_at' => $created_at,
         ]);
     }
 
@@ -154,7 +173,6 @@ final class VisitorLogTracker
             'siteauditor',
             'screamingfrog',
             'barkrowler',
-            'comscore.com',
 
             // Social / feed preview (noise tinggi, tidak bernilai forensik)
             'facebookexternalhit',
@@ -190,17 +208,26 @@ final class VisitorLogTracker
 
             // Commercial crawler yang known & konsisten
             'geedoshopproductfinder',
-            'uptimerobot',
-			'ping.blo.gs',
-			'feedfetcher-google',
-			'archive.org_bot',
-			'sirdata.net'
-			'amzn-searchbot'
         ];
 
+        $bots = apply_filters('neon_simple_visitor_logs_bots', $bots);
+        
         foreach ($bots as $bot) {
+            $bot = strtolower($bot);
             if (str_contains($ua, $bot)) {
                 return true; // EXCLUDE
+            }
+        }
+
+        // Additional Excludes from Settings
+        $custom_exclude = get_option('svl_exclude_user_agents', '');
+        if ($custom_exclude !== '') {
+            $custom_bots = array_filter(array_map('trim', explode("\n", $custom_exclude)));
+            foreach ($custom_bots as $bot) {
+                $bot = strtolower($bot);
+                if ($bot !== '' && str_contains($ua, $bot)) {
+                    return true; // EXCLUDE
+                }
             }
         }
 
